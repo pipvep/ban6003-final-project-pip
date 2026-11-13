@@ -1,0 +1,34 @@
+column_name,data_type,description,source,transformation_or_derivation,notes_or_concerns
+movieId,int64,MovieLens movie identifier; primary key of the ABT.,movies_metadata.csv,Retained as the movie-level key.,Must be unique and nonmissing.
+tmdbId,int64,The Movie Database identifier for the movie.,movies_metadata.csv,Retained as the key for curated credits and keywords.,Checked against links.csv; must be unique in the catalog.
+imdb_id,str,IMDb title identifier.,movies_metadata.csv,Retained without change.,Identifier only; coverage may vary.
+title,str,Movie title.,movies_metadata.csv,Retained without change.,Display text; titles may not be unique.
+original_title,str,Movie title in its original release context.,movies_metadata.csv,Retained without change.,May differ from localized title.
+original_language,str,Original language code.,movies_metadata.csv,Retained without change.,Categorical code.
+release_date,datetime64[us],Movie release date.,movies_metadata.csv,Parsed as datetime; invalid values would become missing.,Available values describe historical releases.
+runtime,float64,Movie runtime in minutes.,movies_metadata.csv,Retained as numeric minutes.,Check for implausible or missing values before modeling.
+budget,int64,Reported production budget.,movies_metadata.csv,Retained as provided.,Zero may indicate unavailable or unreported budget.
+revenue,float64,Reported movie revenue.,movies_metadata.csv,Retained as provided.,"Post-release field; zero may be unavailable, not true zero revenue."
+popularity,float64,Source popularity measure.,movies_metadata.csv,Retained as provided.,Post-release measure; not a pre-release predictor.
+vote_average,float64,Source-site average vote score.,movies_metadata.csv,Retained as provided.,Different source and potentially different scale from MovieLens ratings; post-release.
+vote_count,float64,Number of source-site votes.,movies_metadata.csv,Retained as provided.,Post-release measure; not a pre-release predictor.
+genres,str,Source genre representation.,movies_metadata.csv,Retained as source-formatted text.,Structured text; parse before feature-level use.
+production_companies,str,Source production company representation.,movies_metadata.csv,Retained as source-formatted text.,Structured text; may contain multiple companies.
+production_countries,str,Source production country representation.,movies_metadata.csv,Retained as source-formatted text.,Structured text; may contain multiple countries.
+adult,bool,Source adult-content indicator.,movies_metadata.csv,Retained as provided.,Check source semantics before interpretation.
+status,str,Source release/status label.,movies_metadata.csv,Retained as provided.,Categorical field; may be missing or inconsistent.
+genres_list,str,Pipe-delimited movie genre names.,movies_metadata.csv,Retained as curated text.,Multiple genres are represented in one field.
+primary_genre,str,Primary genre assigned to the movie.,movies_metadata.csv,Retained as provided.,Missing for some movies; does not capture all genres.
+release_year,int64,Calendar year of release.,movies_metadata.csv,Retained as provided.,Derived in the curated source; confirm date/year consistency if needed.
+user_rating_mean,float64,Mean MovieLens rating for this movie.,ratings.csv,Arithmetic mean of rating events grouped by movieId.,Missing when there are no rating events; event averages are less stable for low counts.
+user_rating_count,int64,Number of MovieLens rating events for this movie.,ratings.csv,Count of rating rows grouped by movieId; absent groups set to 0 after left join.,"A rating event count, not necessarily a count of distinct people."
+user_rating_std,float64,Standard deviation of MovieLens ratings for this movie.,ratings.csv,Sample standard deviation grouped by movieId.,Missing with no ratings or only one rating.
+first_rating_date,datetime64[us],Date/time of the earliest MovieLens rating event.,ratings.csv,Minimum rating_datetime grouped by movieId.,Missing when the movie has no rating events.
+last_rating_date,datetime64[us],Date/time of the latest MovieLens rating event.,ratings.csv,Maximum rating_datetime grouped by movieId.,Missing when the movie has no rating events.
+user_rating_distinct_users,int64,Number of distinct MovieLens users rating this movie.,ratings.csv,Count distinct userId values grouped by movieId; absent groups set to 0.,Users may rate more than one movie.
+director,str,Curated director name(s).,credits_curated.csv,Left joined on tmdbId.,Missing values remain missing.
+top_cast,str,Curated top cast names.,credits_curated.csv,Left joined on tmdbId.,Pipe-delimited text; may be missing.
+keywords_list,str,Curated movie keywords.,keywords_curated.csv,Left joined on tmdbId.,Pipe-delimited text; may be missing.
+has_revenue,Int64,Indicator that a positive revenue value is recorded.,movies_metadata.csv,1 when numeric revenue is greater than 0; otherwise 0.,Zero is not proof of no revenue; do not use as a pre-release predictor.
+rating_target_eligible,bool,Whether the movie has enough rating events for the target definition.,ratings.csv,True when user_rating_count is at least 20.,"Eligibility rule is a project choice, not a general standard."
+high_user_rating,Int64,High MovieLens audience rating label for eligible movies.,ratings.csv,1 when eligible mean rating is at least 3.75; 0 otherwise; missing when ineligible.,Observed post-release outcome; not a pre-release predictor.
